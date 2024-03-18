@@ -63,24 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _incrementCounter();
-          if (kIsWeb) {
-            print('Running on Web!');
-          } else if (Platform.isAndroid) {
-            print('Running on Android!');
-          } else if (Platform.isIOS) {
-            print('Running on iOS!');
-          } else if (Platform.isMacOS) {
-            print('Running on macOS!');
-          } else if (Platform.isWindows) {
-            print('Running on Windows!');
-          } else if (Platform.isLinux) {
-            print('Running on Linux!');
-          } else if (Platform.isFuchsia) {
-            print('Running on Fuchsia!');
-          } 
-        },
+        onPressed: () {},
         tooltip: 'Increment',
         icon: const Icon(Icons.broadcast_on_personal_outlined),
         label: const Text("Checl current platform"),
