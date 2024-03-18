@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flux/folder_data.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +26,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -33,57 +35,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  final directoryTracker = DirectoryTracker();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _incrementCounter();
-          if (kIsWeb) {
-            print('Running on Web!');
-          } else if (Platform.isAndroid) {
-            print('Running on Android!');
-          } else if (Platform.isIOS) {
-            print('Running on iOS!');
-          } else if (Platform.isMacOS) {
-            print('Running on macOS!');
-          } else if (Platform.isWindows) {
-            print('Running on Windows!');
-          } else if (Platform.isLinux) {
-            print('Running on Linux!');
-          } else if (Platform.isFuchsia) {
-            print('Running on Fuchsia!');
-          } 
+      appBar: AppBar(title: const Text('Directory Tracker')),
+      body: FutureBuilder(
+        future: directoryTracker.trackDirectories(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // Data available
+            return ListView.builder(
+              itemCount: directoryTracker.trackingData.length,
+              itemBuilder: (_, index) {
+                final directory = directoryTracker.trackingData.keys.elementAt(index);
+                final info = directoryTracker.trackingData[directory]!.first;
+                return ListTile(
+                  title: Text(directory),
+                  subtitle: Text('Files: ${info['fileCount']}'),
+                );
+              },
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         },
-        tooltip: 'Increment',
-        icon: const Icon(Icons.broadcast_on_personal_outlined),
-        label: const Text("Checl current platform"),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            directoryTracker.trackDirectories();
+          });
+        },
+        child: const Icon(Icons.refresh),
       ),
     );
   }
